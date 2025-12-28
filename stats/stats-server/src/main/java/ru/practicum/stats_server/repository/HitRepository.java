@@ -14,11 +14,12 @@ public interface HitRepository extends JpaRepository<Hit, Long> {
     @Query("""
             select new ru.practicum.dto.ResponseStatsDto(h.app, h.uri,
                 case when :unique = true then count(distinct h.ip)
-                     else count(h.ip) end)
+                     else count(h.ip) end as hits)
             from Hit h
             where h.timestamp between :start and :end
               and (:uris is null or h.uri in :uris)
             group by h.app, h.uri
+            order by hits
             """)
     List<ResponseStatsDto> getStats(
             @Param("start") LocalDateTime start,
