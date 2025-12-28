@@ -17,7 +17,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class StatsController {
     private final HitService service;
-    private static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/hit")
@@ -26,8 +25,8 @@ public class StatsController {
     }
 
     @GetMapping("/stats")
-    public List<ResponseStatsDto> findStats(@RequestParam @DateTimeFormat(pattern = DATE_FORMAT) LocalDateTime start,
-                                            @RequestParam @DateTimeFormat(pattern = DATE_FORMAT) LocalDateTime end,
+    public List<ResponseStatsDto> findStats(@RequestParam LocalDateTime start,
+                                            @RequestParam LocalDateTime end,
                                             @RequestParam(required = false) List<String> uris,
                                             @RequestParam(required = false, defaultValue = "false") boolean unique) {
         if (start.isAfter(end))
