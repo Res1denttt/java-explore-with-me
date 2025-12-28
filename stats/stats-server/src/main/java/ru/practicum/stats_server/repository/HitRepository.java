@@ -19,7 +19,7 @@ public interface HitRepository extends JpaRepository<Hit, Long> {
             where h.timestamp between :start and :end
               and (:uris is null or h.uri in :uris)
             group by h.app, h.uri
-            order by hits
+            order by hits desc
             """)
     List<ResponseStatsDto> getStats(
             @Param("start") LocalDateTime start,
