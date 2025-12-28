@@ -10,12 +10,14 @@ import ru.practicum.dto.HitDto;
 import ru.practicum.dto.ResponseStatsDto;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
 public class StatsClient {
     private final RestTemplate restTemplate;
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public void saveHit(String appName, String uri, String ip, LocalDateTime timestamp) {
         HitDto hitDto = new HitDto(appName, uri, ip, timestamp);
@@ -25,8 +27,8 @@ public class StatsClient {
     public List<ResponseStatsDto> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, Boolean unique) {
         String uri = UriComponentsBuilder
                 .fromPath("/stats")
-                .queryParam("start", start)
-                .queryParam("end", end)
+                .queryParam("start", start.format(formatter))
+                .queryParam("end", end.format(formatter))
                 .queryParamIfPresent("uris", Optional.ofNullable(uris))
                 .queryParamIfPresent("unique", Optional.ofNullable(unique))
                 .toUriString();
