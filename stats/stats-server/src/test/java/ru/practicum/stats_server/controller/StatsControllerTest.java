@@ -35,8 +35,7 @@ class StatsControllerTest {
     @Test
     void saveHit_withCustomDateTimeFormat_shouldReturnCreated() throws Exception {
 
-        String json = """
-                {
+        String json = "{" + """
                   "app": "app1",
                   "uri": "/api/test",
                   "ip": "127.0.0.1",
