@@ -48,6 +48,9 @@ public class PublicEventServiceImpl implements PublicEventService {
         List<Event> events = eventRepository.findAllByPublicFilters(text, categories, paid, rangeStart, rangeEnd, EventState.PUBLISHED,
                 PageRequest.of(0, candidateCount)).getContent();
 
+        if (events.isEmpty())
+            return List.of();
+
         List<Long> ids = events.stream()
                 .map(Event::getId)
                 .toList();
@@ -113,7 +116,8 @@ public class PublicEventServiceImpl implements PublicEventService {
         if (event.getPublishedOn() == null) {
             views = 0;
         } else {
-            views = statsClient.getViews(event.getPublishedOn().minusHours(1), LocalDateTime.now().plusHours(1), List.of("/events/" + eventId), true)
+            views = statsClient.getViews(event.getPublishedOn().minusHours(1), LocalDateTime.now().plusHours(1),
+                            List.of("/events/" + eventId), true)
                     .values()
                     .stream()
                     .mapToLong(Long::longValue)
