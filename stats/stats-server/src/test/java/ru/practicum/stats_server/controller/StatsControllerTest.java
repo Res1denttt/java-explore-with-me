@@ -3,21 +3,24 @@ package ru.practicum.stats_server.controller;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import ru.practicum.dto.ResponseStatsDto;
 import ru.practicum.stats_server.config.DateTimeConfig;
 import ru.practicum.stats_server.service.HitService;
-import ru.practicum.dto.ResponseStatsDto;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(StatsController.class)
 @Import(DateTimeConfig.class)
@@ -33,13 +36,13 @@ class StatsControllerTest {
     void saveHit_withCustomDateTimeFormat_shouldReturnCreated() throws Exception {
 
         String json = """
-        {
-          "app": "app1",
-          "uri": "/api/test",
-          "ip": "127.0.0.1",
-          "timestamp": "2025-12-28 14:57:38"
-        }
-        """;
+                {
+                  "app": "app1",
+                  "uri": "/api/test",
+                  "ip": "127.0.0.1",
+                  "timestamp": "2025-12-28 14:57:38"
+                }
+                """;
 
         mockMvc.perform(post("/hit")
                         .contentType(MediaType.APPLICATION_JSON)
