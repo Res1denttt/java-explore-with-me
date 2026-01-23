@@ -24,13 +24,14 @@ public class StatsController {
     }
 
     @GetMapping("/stats")
-    public List<ResponseStatsDto> findStats(@RequestParam LocalDateTime start,
-                                            @RequestParam LocalDateTime end,
-                                            @RequestParam(required = false) List<String> uris,
-                                            @RequestParam(required = false, defaultValue = "false") boolean unique) {
-        if (start.isAfter(end))
+    public List<ResponseStatsDto> findStats(
+            @RequestParam LocalDateTime start,
+            @RequestParam LocalDateTime end,
+            @RequestParam(required = false) List<String> uris,
+            @RequestParam(required = false, defaultValue = "false") boolean unique) {
+        if (start.isAfter(end)) {
             throw new ValidationException("Дата начала диапазона не может быть позже даты конца");
-
+        }
         return service.find(start, end, uris, unique);
     }
 }
