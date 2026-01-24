@@ -41,7 +41,7 @@ public class PublicEventServiceImpl implements PublicEventService {
                                                   LocalDateTime rangeEnd, boolean onlyAvailable, EventSortType sort,
                                                   int from, int size, String ip) {
         text = text == null || text.isEmpty() ? null : "%" + text.toLowerCase() + "%";
-        if (categories.isEmpty()) categories = null;
+        if (categories == null || categories.isEmpty()) categories = null;
         if (rangeStart == null) rangeStart = LocalDateTime.now();
         int candidateCount = Math.min(size + 500, 1000);
 
