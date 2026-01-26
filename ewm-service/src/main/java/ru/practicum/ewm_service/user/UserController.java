@@ -22,7 +22,6 @@ import java.util.List;
 public class UserController {
 
     private final UserService service;
-    private final UserValidator validator;
 
     @GetMapping
     public List<UserDto> findAll(@RequestParam(required = false) List<Long> ids,
@@ -35,7 +34,6 @@ public class UserController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public UserDto create(@RequestBody @Valid NewUserRequest dto) {
-        validator.validate(dto);
         log.info("Запрос на создание пользователя: name = '{}', email = '{}'", dto.name(), dto.email());
         return service.create(dto);
     }

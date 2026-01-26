@@ -1,6 +1,7 @@
 package ru.practicum.ewm_service.event.service.authorized;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,9 +38,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class PrivateEventServiceImpl implements PrivateEventService {
 
     private final EventRepository eventRepository;
@@ -106,11 +109,17 @@ public class PrivateEventServiceImpl implements PrivateEventService {
         if (event.getPublishedOn() == null) {
             views = 0;
         } else {
-            views = statsClient.getViews(event.getPublishedOn(), LocalDateTime.now().plusHours(1), List.of("/events/" + eventId), true)
+            LocalDateTime start = event.getPublishedOn();
+            LocalDateTime end = LocalDateTime.now().plusHours(1);
+            List<String> uri = List.of("/events/" + eventId);
+            boolean unique = true;
+            views = statsClient.getViews(start, end, uri, unique)
                     .values()
                     .stream()
                     .mapToLong(Long::longValue)
                     .sum();
+            log.info("Received from stats-server for start = {}, end = {}, uris = {}, unique = {}, views = {}",
+                    start, end, uri, unique, views);
         }
         return eventMapper.toEventFullDto(event, confirmedRequests, views);
     }
@@ -119,9 +128,7 @@ public class PrivateEventServiceImpl implements PrivateEventService {
     @Transactional
     public EventFullDto update(long userId, long eventId, UpdateEventUserRequest request) {
         Event event = getEvent(userId, eventId);
-        updateValidator.validate(request);
-        updateValidator.validateEventState(event);
-        updateValidator.validateRequest(request);
+        updateValidator.validate(request, event.getState(), event.getEventDate());
         Category category = request.category() == null ? event.getCategory() : categoryRepository.findById(request.category())
                 .orElseThrow(() -> new NotFoundException("Category with id=" + request.category() + "was not found"));
         EventState state = EventState.PENDING;
@@ -152,7 +159,7 @@ public class PrivateEventServiceImpl implements PrivateEventService {
         statusValidator.validate(requests);
         if (request.status().equals(RequestDecision.REJECTED)) {
             requests.forEach(r -> r.setStatus(RequestStatus.REJECTED));
-            requestRepository.flush();
+            requestRepository.saveAll(requests);
             return new EventRequestStatusUpdateResult(
                     List.of(),
                     requests.stream()
@@ -165,14 +172,13 @@ public class PrivateEventServiceImpl implements PrivateEventService {
         int remainedLimit = event.getParticipantLimit() - requestsConfirmed;
         if (remainedLimit <= 0) {
             requests.forEach(r -> r.setStatus(RequestStatus.REJECTED));
-            requestRepository.flush();
+            requestRepository.saveAll(requests);
             throw new ConditionsNotMetException("The participant limit has been reached");
         }
         if (remainedLimit >= requests.size()) {
             requests.forEach(r -> r.setStatus(RequestStatus.CONFIRMED));
             if (remainedLimit == requests.size())
                 requestRepository.cancelAllRequests(eventId, RequestStatus.REJECTED, RequestStatus.PENDING);
-            requestRepository.flush();
             return new EventRequestStatusUpdateResult(
                     requests.stream().map(requestMapper::toRequestDto).toList(),
                     List.of()
@@ -191,7 +197,8 @@ public class PrivateEventServiceImpl implements PrivateEventService {
                 .filter(r -> idsToReject.contains(r.getId()))
                 .toList();
         requestsToReject.forEach(r -> r.setStatus(RequestStatus.REJECTED));
-        requestRepository.flush();
+        List<ParticipationRequest> toSave = Stream.concat(requestsToConfirm.stream(), requestsToReject.stream()).toList();
+        requestRepository.saveAll(toSave);
 
         return new EventRequestStatusUpdateResult(
                 requestsToConfirm.stream()

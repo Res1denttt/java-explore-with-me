@@ -13,7 +13,6 @@ import ru.practicum.ewm_service.event.dto.EventFullDto;
 import ru.practicum.ewm_service.event.dto.UpdateEventAdminRequest;
 import ru.practicum.ewm_service.event.model.Event;
 import ru.practicum.ewm_service.event.model.EventState;
-import ru.practicum.ewm_service.event.validation.EventValidator;
 import ru.practicum.ewm_service.event.validation.UpdateEventAdminRequestValidator;
 import ru.practicum.ewm_service.exception.NotFoundException;
 import ru.practicum.ewm_service.request.RequestRepository;
@@ -36,7 +35,7 @@ public class AdminEventServiceImpl implements AdminEventService {
     private final StatsClientConnector statsClient;
     private final EventMapper mapper;
     private final UpdateEventAdminRequestValidator requestValidator;
-    private final EventValidator eventValidator;
+
 
     @Override
     public List<EventFullDto> getEvents(List<Long> users,
@@ -86,10 +85,7 @@ public class AdminEventServiceImpl implements AdminEventService {
     public EventFullDto update(long eventId, UpdateEventAdminRequest request) {
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new NotFoundException("Event with id=" + eventId + "was not found"));
-        eventValidator.validate(event);
-        requestValidator.validate(request);
-        requestValidator.validateEventState(event);
-        requestValidator.validateRequest(request);
+        requestValidator.validate(request, event.getState(), event.getEventDate());
         Category category = request.category() == null ? event.getCategory() : categoryRepository.findById(request.category())
                 .orElseThrow(() -> new NotFoundException("Category with id=" + request.category() + "was not found"));
         EventState newState = EventState.PENDING;
@@ -100,6 +96,7 @@ public class AdminEventServiceImpl implements AdminEventService {
             newState = EventState.CANCELED;
         }
         mapper.updateEventFromAdminRequest(event, request, category, newState);
+        eventRepository.save(event);
         int confirmedRequests = requestRepository.countByEventIdAndStatus(event.getId(), RequestStatus.CONFIRMED);
         long views;
         if (event.getPublishedOn() == null) {

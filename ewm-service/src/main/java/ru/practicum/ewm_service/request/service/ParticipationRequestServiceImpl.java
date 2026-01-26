@@ -40,7 +40,7 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
     @Override
     @Transactional
     public ParticipationRequestDto create(long userId, long eventId) {
-        if (requestRepository.findByRequesterIdAndEventId(userId, eventId).isPresent())
+        if (requestRepository.existsByRequesterIdAndEventId(userId, eventId))
             throw new ConditionsNotMetException("Запрос уже был создан ранее");
 
         Event event = eventRepository.findById(eventId)

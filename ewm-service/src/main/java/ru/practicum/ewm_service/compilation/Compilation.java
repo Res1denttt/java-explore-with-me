@@ -1,6 +1,7 @@
 package ru.practicum.ewm_service.compilation;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 import ru.practicum.ewm_service.event.model.Event;
@@ -17,6 +18,7 @@ public class Compilation {
     private Long id;
 
     @Column
+    @Size(max = 50, message = "Длинна заголовка должна быть не более 50 символов")
     private String title;
 
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)

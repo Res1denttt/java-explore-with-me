@@ -11,7 +11,6 @@ import ru.practicum.ewm_service.event.dto.EventShortDto;
 import ru.practicum.ewm_service.event.dto.NewEventDto;
 import ru.practicum.ewm_service.event.dto.UpdateEventUserRequest;
 import ru.practicum.ewm_service.event.service.authorized.PrivateEventService;
-import ru.practicum.ewm_service.event.validation.EventValidator;
 import ru.practicum.ewm_service.request.dto.EventRequestStatusUpdateRequest;
 import ru.practicum.ewm_service.request.dto.EventRequestStatusUpdateResult;
 import ru.practicum.ewm_service.request.dto.ParticipationRequestDto;
@@ -24,12 +23,10 @@ import java.util.List;
 @Slf4j
 public class PrivateEventController {
     private final PrivateEventService service;
-    private final EventValidator eventValidator;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public EventFullDto create(@PathVariable long userId, @Valid @RequestBody NewEventDto dto) {
-        eventValidator.validate(dto);
         log.info("Private запрос от пользователя с id = {} на создание нового события", userId);
         return service.create(userId, dto);
     }

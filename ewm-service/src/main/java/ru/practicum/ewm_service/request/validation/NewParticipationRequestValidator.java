@@ -32,7 +32,6 @@ public class NewParticipationRequestValidator {
             );
     }
 
-
     private void validateLimit(int requestsLimit, int requestsCount) {
         if (requestsLimit == 0) return;
 

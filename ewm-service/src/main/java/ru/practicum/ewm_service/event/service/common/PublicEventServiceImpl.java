@@ -91,8 +91,6 @@ public class PublicEventServiceImpl implements PublicEventService {
             dtos.sort(Comparator.comparing(EventShortDto::views).reversed());
 
         statsClient.saveHit(APP_NAME, BASE_URI, ip, LocalDateTime.now());
-        log.info("Hit sent to stats-server: " + APP_NAME + ", " + BASE_URI + ", ip = {}, time = {}",
-                ip, LocalDateTime.now());
 
         if (dtos.size() > size + from) {
             return dtos.subList(from, from + size);
@@ -108,20 +106,28 @@ public class PublicEventServiceImpl implements PublicEventService {
                 .orElseThrow(() -> new NotFoundException("Event with id=" + eventId + "was not found"));
         if (event.getState() != EventState.PUBLISHED)
             throw new NotFoundException("Event with id=" + eventId + "was not found");
-        statsClient.saveHit(APP_NAME, BASE_URI + "/" + eventId, ip, LocalDateTime.now());
-        log.info("Hit sent to stats-server: " + APP_NAME + ", " + BASE_URI + "/{}, ip = {}, time = {}",
-                eventId, ip, LocalDateTime.now());
+        LocalDateTime now = LocalDateTime.now();
+        log.debug("Hit sending to stats-server: appName =  {}, uri = {}, ip = {}, time = {}",
+                APP_NAME, BASE_URI + eventId, ip, now);
+        statsClient.saveHit(APP_NAME, BASE_URI + "/" + eventId, ip, now);
+        log.info("Hit sent to stats-server: uri = {}, time = {}", BASE_URI + "/" + eventId, now);
         int confirmedRequests = requestRepository.countByEventIdAndStatus(event.getId(), RequestStatus.CONFIRMED);
         long views;
         if (event.getPublishedOn() == null) {
             views = 0;
         } else {
-            views = statsClient.getViews(event.getPublishedOn().minusHours(1), LocalDateTime.now().plusHours(1),
-                            List.of("/events/" + eventId), true)
+            LocalDateTime start = event.getPublishedOn().minusHours(1);
+            LocalDateTime end = LocalDateTime.now().plusHours(1);
+            List<String> uris = List.of("/events/" + eventId);
+            boolean unique = true;
+            views = statsClient.getViews(start, end,
+                            uris, unique)
                     .values()
                     .stream()
                     .mapToLong(Long::longValue)
                     .sum();
+            log.info("Received from stats-server for start = {}, end = {}, uris = {}, unique = {}, views = {}",
+                    start, end, uris, unique, views);
         }
         return eventMapper.toEventFullDto(event, confirmedRequests, views);
     }

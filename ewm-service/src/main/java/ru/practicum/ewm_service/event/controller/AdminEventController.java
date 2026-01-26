@@ -1,5 +1,6 @@
 package ru.practicum.ewm_service.event.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -34,7 +35,7 @@ public class AdminEventController {
     }
 
     @PatchMapping("/{eventId}")
-    public EventFullDto updateEvent(@PathVariable long eventId, @RequestBody UpdateEventAdminRequest request) {
+    public EventFullDto updateEvent(@PathVariable long eventId, @RequestBody @Valid UpdateEventAdminRequest request) {
         log.info("Admin запрос на изменение события id={}, state={}, paid={}, limit={}, cat={}",
                 eventId, request.stateAction(), request.paid(), request.participantLimit(), request.category());
         return service.update(eventId, request);
