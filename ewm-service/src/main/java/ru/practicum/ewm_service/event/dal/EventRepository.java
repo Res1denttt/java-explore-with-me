@@ -55,5 +55,28 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             Pageable pageable
     );
 
+    @Query("""
+                select e
+                from Event e
+                where (:text is null or lower(e.annotation) like :text or lower(e.description) like :text)
+                  and (:categories is null or e.category.id in :categories)
+                  and (:paid is null or e.paid = :paid)
+                  and (cast(:rangeStart as timestamp) is null or e.eventDate >= :rangeStart)
+                  and (cast(:rangeEnd as timestamp) is null or e.eventDate < :rangeEnd)
+                  and e.state = :state
+                  and e.initiator.id in :ids
+                order by e.eventDate
+            """)
+    Page<Event> findAllByInitiatorIdAndFilters(
+            @Param("text") String text,
+            @Param("categories") List<Long> categories,
+            @Param("paid") Boolean paid,
+            @Param("rangeStart") LocalDateTime rangeStart,
+            @Param("rangeEnd") LocalDateTime rangeEnd,
+            @Param("state") EventState state,
+            @Param("ids") List<Long> ids,
+            Pageable pageable
+    );
+
 
 }
