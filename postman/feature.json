@@ -8,55 +8,26 @@
   },
   "item": [
     {
-      "name": "Получение списка подписчиков",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "type": "text/javascript",
-            "exec": [
-              "pm.test(\"Status code is 200\", function () {",
-              "    pm.response.to.have.status(200);",
-              "});"
-            ]
-          }
-        }
-      ],
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{base_url}}/info?id=1",
-          "host": [
-            "{{base_url}}"
-          ],
-          "path": [
-            "info"
-          ],
-          "query": [
-            {
-              "key": "id",
-              "value": "1"
-            }
-          ]
-        },
-        "description": "This is a GET request and it is used to \"get\" data from an endpoint. There is no request body for a GET request, but you can use query parameters to help specify the resource you want data on (e.g., in this request, we have `id=1`).\n\nA successful GET response will have a `200 OK` status, and should include some kind of response body - for example, HTML web content or JSON data."
-      },
-      "response": []
-    },
-    {
       "name": "Создание подписки",
       "event": [
         {
           "listen": "test",
           "script": {
-            "type": "text/javascript",
             "exec": [
-              "pm.test(\"Successful POST request\", function () {",
-              "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
-              "});",
-              ""
-            ]
+              "pm.test(\"Status code is 201\", function () {",
+              "    pm.response.to.have.status(201);",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        },
+        {
+          "listen": "prerequest",
+          "script": {
+            "packages": {},
+            "type": "text/javascript"
           }
         }
       ],
@@ -73,15 +44,284 @@
           }
         },
         "url": {
-          "raw": "{{base_url}}/info",
+          "raw": "{{base_url}}/users/1/subscriptions/2",
           "host": [
             "{{base_url}}"
           ],
           "path": [
-            "info"
+            "users",
+            "1",
+            "subscriptions",
+            "2"
           ]
         },
         "description": "This is a POST request, submitting data to an API via the request body. This request submits JSON data, and the data is reflected in the response.\n\nA successful POST request typically returns a `200 OK` or `201 Created` response code."
+      },
+      "response": []
+    },
+    {
+      "name": "409 - Создание существующей подписки",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 409\", function () {\r",
+              "    pm.response.to.have.status(409);\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/users/1/subscriptions/2",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "users",
+            "1",
+            "subscriptions",
+            "2"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "404 - Удаление несуществующей подписки",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 404\", function () {\r",
+              "    pm.response.to.have.status(404);\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/users/1/subscriptions/5",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "users",
+            "1",
+            "subscriptions",
+            "5"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Смена статуса запрета подписок",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 204\", function () {\r",
+              "    pm.response.to.have.status(204);\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "PATCH",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/users/4/subscriptions?prohibitFollows=true",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "users",
+            "4",
+            "subscriptions"
+          ],
+          "query": [
+            {
+              "key": "prohibitFollows",
+              "value": "true"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "409 - Смена статуса запрета подписок на уже установленный",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 409\", function () {\r",
+              "    pm.response.to.have.status(409);\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "PATCH",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/users/4/subscriptions?prohibitFollows=true",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "users",
+            "4",
+            "subscriptions"
+          ],
+          "query": [
+            {
+              "key": "prohibitFollows",
+              "value": "true"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "409 - Создание подписки на пользователя, запретившего подписки",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 409\", function () {\r",
+              "    pm.response.to.have.status(409);\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/users/1/subscriptions/4",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "users",
+            "1",
+            "subscriptions",
+            "4"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Получение списка подписчиков",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/users/2/subscriptions/followers",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "users",
+            "2",
+            "subscriptions",
+            "followers"
+          ]
+        },
+        "description": "This is a GET request and it is used to \"get\" data from an endpoint. There is no request body for a GET request, but you can use query parameters to help specify the resource you want data on (e.g., in this request, we have `id=1`).\n\nA successful GET response will have a `200 OK` status, and should include some kind of response body - for example, HTML web content or JSON data."
+      },
+      "response": []
+    },
+    {
+      "name": "Получение событий подписок",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/users/1/subscriptions",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "users",
+            "1",
+            "subscriptions"
+          ]
+        }
       },
       "response": []
     },
@@ -91,13 +331,21 @@
         {
           "listen": "test",
           "script": {
-            "type": "text/javascript",
             "exec": [
-              "pm.test(\"Successful DELETE request\", function () {",
-              "    pm.expect(pm.response.code).to.be.oneOf([200, 202, 204]);",
-              "});",
-              ""
-            ]
+              "pm.test(\"Status code is 204\", function () {",
+              "    pm.response.to.have.status(204);",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        },
+        {
+          "listen": "prerequest",
+          "script": {
+            "packages": {},
+            "type": "text/javascript"
           }
         }
       ],
@@ -114,202 +362,18 @@
           }
         },
         "url": {
-          "raw": "{{base_url}}/info?id=1",
-          "host": [
-            "{{base_url}}"
-          ],
-          "path": [
-            "info"
-          ],
-          "query": [
-            {
-              "key": "id",
-              "value": "1"
-            }
-          ]
-        },
-        "description": "This is a DELETE request, and it is used to delete data that was previously created via a POST request. You typically identify the entity being updated by including an identifier in the URL (eg. `id=1`).\n\nA successful DELETE request typically returns a `200 OK`, `202 Accepted`, or `204 No Content` response code."
-      },
-      "response": []
-    },
-    {
-      "name": "409 - Создание существующей подписки",
-      "request": {
-        "method": "GET",
-        "header": []
-      },
-      "response": []
-    },
-    {
-      "name": "404 - Удаление несуществующей подписки",
-      "request": {
-        "method": "GET",
-        "header": []
-      },
-      "response": []
-    },
-    {
-      "name": "Смена статуса запрета подписок",
-      "request": {
-        "method": "GET",
-        "header": []
-      },
-      "response": []
-    },
-    {
-      "name": "409 - Смена статуса запрета подписок на уже установленный",
-      "request": {
-        "method": "GET",
-        "header": []
-      },
-      "response": []
-    },
-    {
-      "name": "409 - Создание подписки на пользователя, запретившего подписки",
-      "request": {
-        "method": "GET",
-        "header": []
-      },
-      "response": []
-    },
-    {
-      "name": "Получение событий подписок",
-      "event": [
-        {
-          "listen": "prerequest",
-          "script": {
-            "exec": [
-              "const main = async () => {\r",
-              "    const api = new API(pm);\r",
-              "    const rnd = new RandomUtils();\r",
-              "\r",
-              "    try {\r",
-              "        // пользователь — автор события\r",
-              "        const initiator = await api.addUser(rnd.getUser());\r",
-              "\r",
-              "        // пользователь — подписчик\r",
-              "        const follower = await api.addUser(rnd.getUser());\r",
-              "\r",
-              "        // категория\r",
-              "        const category = await api.addCategory(rnd.getCategory());\r",
-              "\r",
-              "        // событие\r",
-              "        let event = await api.addEvent(initiator.id, rnd.getEvent(category.id));\r",
-              "        event = await api.publishEvent(event.id);\r",
-              "\r",
-              "        // подписка\r",
-              "        await api.subscribeToUser(follower.id, initiator.id);\r",
-              "\r",
-              "        // path variable\r",
-              "        pm.collectionVariables.set('userId', follower.id);\r",
-              "\r",
-              "        // query variables\r",
-              "        pm.collectionVariables.set('text', event.annotation);\r",
-              "        pm.collectionVariables.set('categoryId', category.id);\r",
-              "        pm.collectionVariables.set('paid', event.paid);\r",
-              "\r",
-              "        // ожидаемый результат\r",
-              "        pm.collectionVariables.set('response', event);\r",
-              "\r",
-              "    } catch (e) {\r",
-              "        console.error('Ошибка подготовки данных', e);\r",
-              "    }\r",
-              "};\r",
-              "\r",
-              "const interval = setInterval(() => {}, 1000);\r",
-              "\r",
-              "setTimeout(async () => {\r",
-              "    try {\r",
-              "        await main();\r",
-              "    } finally {\r",
-              "        clearInterval(interval);\r",
-              "    }\r",
-              "}, 100);\r",
-              ""
-            ],
-            "type": "text/javascript",
-            "packages": {},
-            "requests": {}
-          }
-        },
-        {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "pm.test(\"Статус 200 и JSON\", function () {\r",
-              "    pm.response.to.be.ok;\r",
-              "    pm.response.to.be.json;\r",
-              "});\r",
-              "\r",
-              "const source = pm.collectionVariables.get('response');\r",
-              "const body = pm.response.json();\r",
-              "\r",
-              "pm.test(\"Ответ не пустой\", function () {\r",
-              "    pm.expect(body.length).to.be.above(0);\r",
-              "});\r",
-              "\r",
-              "const target = body[0];\r",
-              "\r",
-              "pm.test(\"Поля события присутствуют\", function () {\r",
-              "    pm.expect(target).to.have.property('id');\r",
-              "    pm.expect(target).to.have.property('title');\r",
-              "    pm.expect(target).to.have.property('annotation');\r",
-              "    pm.expect(target).to.have.property('category');\r",
-              "    pm.expect(target).to.have.property('paid');\r",
-              "    pm.expect(target).to.have.property('eventDate');\r",
-              "    pm.expect(target).to.have.property('initiator');\r",
-              "    pm.expect(target).to.have.property('views');\r",
-              "    pm.expect(target).to.have.property('confirmedRequests');\r",
-              "});\r",
-              "\r",
-              "pm.test(\"Событие принадлежит пользователю, на которого есть подписка\", function () {\r",
-              "    pm.expect(target.initiator.id)\r",
-              "        .to.equal(source.initiator.id);\r",
-              "});\r",
-              "\r",
-              "pm.test(\"Данные события совпадают с ожидаемыми\", function () {\r",
-              "    pm.expect(target.title).to.equal(source.title);\r",
-              "    pm.expect(target.annotation).to.equal(source.annotation);\r",
-              "    pm.expect(target.category.id).to.equal(source.category.id);\r",
-              "    pm.expect(target.paid.toString()).to.equal(source.paid.toString());\r",
-              "    pm.expect(target.eventDate).to.equal(source.eventDate);\r",
-              "});\r",
-              ""
-            ],
-            "type": "text/javascript",
-            "packages": {},
-            "requests": {}
-          }
-        }
-      ],
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{base_url}}/users/{{userId}}/subscriptions?text={{text}}&categories={{categoryId}}&paid={{paid}}",
+          "raw": "{{base_url}}/users/1/subscriptions/2",
           "host": [
             "{{base_url}}"
           ],
           "path": [
             "users",
-            "{{userId}}",
-            "subscriptions"
-          ],
-          "query": [
-            {
-              "key": "text",
-              "value": "{{text}}"
-            },
-            {
-              "key": "categories",
-              "value": "{{categoryId}}"
-            },
-            {
-              "key": "paid",
-              "value": "{{paid}}"
-            }
+            "1",
+            "subscriptions",
+            "2"
           ]
-        }
+        },
+        "description": "This is a DELETE request, and it is used to delete data that was previously created via a POST request. You typically identify the entity being updated by including an identifier in the URL (eg. `id=1`).\n\nA successful DELETE request typically returns a `200 OK`, `202 Accepted`, or `204 No Content` response code."
       },
       "response": []
     }
@@ -321,184 +385,7 @@
         "type": "text/javascript",
         "requests": {},
         "exec": [
-          "API = class {\r",
-          "    constructor(postman, verbose = false, baseUrl = \"http://localhost:8080\") {\r",
-          "        this.baseUrl = baseUrl;\r",
-          "        this.pm = postman;\r",
-          "        this._verbose = verbose;\r",
-          "    }\r",
-          "\r",
-          "    async addUser(user, verbose=null) {\r",
-          "        return this.post(\"/admin/users\", user, \"Ошибка при добавлении нового пользователя: \", verbose);\r",
-          "    }\r",
-          "\r",
-          "    async addCategory(category, verbose=null) {\r",
-          "        return this.post(\"/admin/categories\", category, \"Ошибка при добавлении новой категории: \", verbose);\r",
-          "    }\r",
-          "\r",
-          "    async addEvent(userId, event, verbose=null) {\r",
-          "        return this.post(\"/users/\" + userId + \"/events\", event, \"Ошибка при добавлении нового события: \", verbose);\r",
-          "    }\r",
-          "\r",
-          "    async addCompilation(compilation, verbose=null) {\r",
-          "        return this.post(\"/admin/compilations\", compilation, \"Ошибка при добавлении новой подборки: \", verbose);\r",
-          "    }\r",
-          "\r",
-          "    async publishParticipationRequest(eventId, userId, verbose=null) {\r",
-          "        return this.post('/users/' + userId + '/requests?eventId=' + eventId, null, \"Ошибка при добавлении нового запроса на участие в событии\", verbose);\r",
-          "    }\r",
-          "\r",
-          "    async publishEvent(eventId, verbose=null) {\r",
-          "        return this.patch('/admin/events/' + eventId, {stateAction: \"PUBLISH_EVENT\"}, \"Ошибка при публикации события\", verbose);\r",
-          "    }\r",
-          "\r",
-          "    async subscribeToUser(followerId, authorId, verbose=null) {\r",
-          "    return this.post(`/users/${followerId}/subscriptions/${authorId}`, null, \"Ошибка подписки: \", verbose);\r",
-          "    }\r",
-          "    \r",
-          "    async rejectEvent(eventId, verbose=null) {\r",
-          "        return this.patch('/admin/events/' + eventId, {stateAction: \"REJECT_EVENT\"}, \"Ошибка при отмене события\", verbose);\r",
-          "    }\r",
-          "\r",
-          "    async acceptParticipationRequest(eventId, userId, reqId, verbose=null) {\r",
-          "        return this.patch('/users/' + userId + '/events/' + eventId + '/requests', {requestIds:[reqId], status: \"CONFIRMED\"}, \"Ошибка при принятии заявки на участие в событии\", verbose);\r",
-          "    }\r",
-          "\r",
-          "    async findCategory(catId, verbose=null) {\r",
-          "        return this.get('/categories/' + catId, null, \"Ошибка при поиске категории по id\", verbose);\r",
-          "    }\r",
-          "\r",
-          "    async findCompilation(compId, verbose=null) {\r",
-          "        return this.get('/compilations/' + compId, null, \"Ошибка при поиске подборки по id\", verbose);\r",
-          "    }\r",
-          "\r",
-          "    async findEvent(eventId, verbose=null) {\r",
-          "        return this.get('/events/' + eventId, null, \"Ошибка при поиске события по id\", verbose);\r",
-          "    }\r",
-          "\r",
-          "    async findUser(userId, verbose=null) {\r",
-          "        return this.get('/admin/users?ids=' + userId, null, \"Ошибка при поиске пользователя по id\", verbose);\r",
-          "    }\r",
-          "\r",
-          "    async post(path, body, errorText = \"Ошибка при выполнении post-запроса: \", verbose=null) {\r",
-          "        return this.sendRequest(\"POST\", path, body, errorText, verbose);\r",
-          "    }\r",
-          "\r",
-          "    async patch(path, body = null, errorText = \"Ошибка при выполнении patch-запроса: \", verbose=null) {\r",
-          "        return this.sendRequest(\"PATCH\", path, body, errorText, verbose);\r",
-          "    }\r",
-          "\r",
-          "    async get(path, body = null, errorText = \"Ошибка при выполнении get-запроса: \", verbose=null) {\r",
-          "        return this.sendRequest(\"GET\", path, body, errorText, verbose);\r",
-          "    }\r",
-          "    async sendRequest(method, path, body=null, errorText = \"Ошибка при выполнении запроса: \", verbose=null) {\r",
-          "        return new Promise((resolve, reject) => {\r",
-          "            verbose = verbose == null ? this._verbose : verbose;\r",
-          "            const request = {\r",
-          "                url: this.baseUrl + path,\r",
-          "                method: method,\r",
-          "                body: body == null ? \"\" : JSON.stringify(body),\r",
-          "                header: { \"Content-Type\": \"application/json\" },\r",
-          "            };\r",
-          "            if(verbose) {\r",
-          "                console.log(\"Отправляю запрос: \", request);\r",
-          "            }\r",
-          "\r",
-          "            try {\r",
-          "                this.pm.sendRequest(request, (error, response) => {\r",
-          "                    if(error || (response.code >= 400 && response.code <= 599)) {\r",
-          "                        let err = error ? error : JSON.stringify(response.json());\r",
-          "                        console.error(\"При выполнении запроса к серверу возникла ошика.\\n\", err,\r",
-          "                             \"\\nДля отладки проблемы повторите такой же запрос к вашей программе \" + \r",
-          "                             \"на локальном компьютере. Данные запроса:\\n\", JSON.stringify(request));\r",
-          "\r",
-          "                        reject(new Error(errorText + err));\r",
-          "                    }\r",
-          "                    if(verbose) {\r",
-          "                        console.log(\"Результат обработки запроса: код состояния - \", response.code, \", тело: \", response.json());\r",
-          "                    }\r",
-          "                    if (response.stream.length === 0) {\r",
-          "                        resolve({});\r",
-          "                    }else{\r",
-          "                        resolve(response.json());\r",
-          "                    }\r",
-          "                });\r",
-          "                \r",
-          "            } catch(err) {\r",
-          "                if(verbose) {\r",
-          "                    console.error(errorText, err);\r",
-          "                }\r",
-          "                return Promise.reject(err);\r",
-          "            }\r",
-          "        });\r",
-          "    }\r",
-          "};\r",
-          "\r",
-          "RandomUtils = class {\r",
-          "    constructor() {}\r",
-          "\r",
-          "    getUser() {\r",
-          "        return {\r",
-          "            name: pm.variables.replaceIn('{{$randomFullName}}'),\r",
-          "            email: pm.variables.replaceIn('{{$randomEmail}}')\r",
-          "        };\r",
-          "    }\r",
-          "\r",
-          "    getCategory() {\r",
-          "        return {\r",
-          "            name: pm.variables.replaceIn('{{$randomWord}}') + Math.floor(Math.random() * 10000 * Math.random()).toString()\r",
-          "        };\r",
-          "    }\r",
-          "\r",
-          "    getEvent(categoryId) {\r",
-          "        return {\r",
-          "            annotation: pm.variables.replaceIn('{{$randomLoremParagraph}}'),\r",
-          "            category: categoryId,\r",
-          "            description: pm.variables.replaceIn('{{$randomLoremParagraphs}}'),\r",
-          "            eventDate: this.getFutureDateTime(),\r",
-          "            location: {\r",
-          "                lat: parseFloat(pm.variables.replaceIn('{{$randomLatitude}}')),\r",
-          "                lon: parseFloat(pm.variables.replaceIn('{{$randomLongitude}}')),\r",
-          "            },\r",
-          "            paid: pm.variables.replaceIn('{{$randomBoolean}}'),\r",
-          "            participantLimit: pm.variables.replaceIn('{{$randomInt}}'),\r",
-          "            requestModeration: pm.variables.replaceIn('{{$randomBoolean}}'),\r",
-          "            title: pm.variables.replaceIn('{{$randomLoremSentence}}'),\r",
-          "        }\r",
-          "    }\r",
-          "\r",
-          "    getCompilation(...eventIds) {\r",
-          "        return {\r",
-          "            title: pm.variables.replaceIn('{{$randomLoremSentence}}').slice(0, 50),\r",
-          "            pinned: pm.variables.replaceIn('{{$randomBoolean}}'),\r",
-          "            events: eventIds\r",
-          "        };\r",
-          "    }\r",
-          "\r",
-          "\r",
-          "    getFutureDateTime(hourShift = 5, minuteShift=0, yearShift=0) {\r",
-          "        let moment = require('moment');\r",
-          "\r",
-          "        let m = moment();\r",
-          "        m.add(hourShift, 'hour');\r",
-          "        m.add(minuteShift, 'minute');\r",
-          "        m.add(yearShift, 'year');\r",
-          "\r",
-          "        return m.format('YYYY-MM-DD HH:mm:ss');\r",
-          "    }\r",
-          "\r",
-          "    getWord(length = 1) {\r",
-          "        let result = '';\r",
-          "        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';\r",
-          "        const charactersLength = characters.length;\r",
-          "        let counter = 0;\r",
-          "        while (counter < length) {\r",
-          "            result += characters.charAt(Math.floor(Math.random() * charactersLength));\r",
-          "            counter += 1;\r",
-          "        }\r",
-          "        return result;\r",
-          "    }\r",
-          "}"
+          ""
         ]
       }
     },
@@ -515,131 +402,7 @@
   ],
   "variable": [
     {
-      "key": "id",
-      "value": "1"
-    },
-    {
       "key": "base_url",
-      "value": "https://template.postman-echo.com"
-    },
-    {
-      "key": "userEndpoint",
-      "value": ""
-    },
-    {
-      "key": "followerId",
-      "value": ""
-    },
-    {
-      "key": "contentMakerId",
-      "value": ""
-    },
-    {
-      "key": "userId",
-      "value": ""
-    },
-    {
-      "key": "followerCount",
-      "value": ""
-    },
-    {
-      "key": "prohibitFollows",
-      "value": ""
-    },
-    {
-      "key": "userId409",
-      "value": ""
-    },
-    {
-      "key": "prohibitFollows409",
-      "value": ""
-    },
-    {
-      "key": "followerId409",
-      "value": ""
-    },
-    {
-      "key": "contentMakerId409",
-      "value": ""
-    },
-    {
-      "key": "followerId409_prohibit",
-      "value": ""
-    },
-    {
-      "key": "contentMakerId409_prohibit",
-      "value": ""
-    },
-    {
-      "key": "userId_events",
-      "value": ""
-    },
-    {
-      "key": "userId_pub_events",
-      "value": ""
-    },
-    {
-      "key": "eventId_pub",
-      "value": ""
-    },
-    {
-      "key": "expectedEventId",
-      "value": ""
-    },
-    {
-      "key": "expectedAuthorId",
-      "value": ""
-    },
-    {
-      "key": "expectedEventTitle",
-      "value": ""
-    },
-    {
-      "key": "expectedEventAnnotation",
-      "value": ""
-    },
-    {
-      "key": "text",
-      "value": ""
-    },
-    {
-      "key": "categoryId",
-      "value": ""
-    },
-    {
-      "key": "paid",
-      "value": ""
-    },
-    {
-      "key": "expectedEvent",
-      "value": ""
-    },
-    {
-      "key": "testUserId",
-      "value": ""
-    },
-    {
-      "key": "expectedFollowerCount",
-      "value": ""
-    },
-    {
-      "key": "test_followers_1769526205158_userId",
-      "value": ""
-    },
-    {
-      "key": "test_followers_1769526205158_followerCount",
-      "value": ""
-    },
-    {
-      "key": "testUserName",
-      "value": ""
-    },
-    {
-      "key": "testUserId409_true",
-      "value": ""
-    },
-    {
-      "key": "testUserId409",
       "value": ""
     }
   ]
