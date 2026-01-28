@@ -3,6 +3,7 @@ package ru.practicum.ewm_service.event.service.common;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.ewm_service.event.EventMapper;
 import ru.practicum.ewm_service.event.dal.EventRepository;
@@ -42,8 +43,8 @@ public class PublicEventServiceImpl implements PublicEventService {
         if (rangeStart == null) rangeStart = LocalDateTime.now();
         int candidateCount = Math.min(size + 500, 1000);
 
-        List<Event> events = eventRepository.findAllByPublicFilters(text, categories, paid, rangeStart, rangeEnd, EventState.PUBLISHED,
-                PageRequest.of(0, candidateCount)).getContent();
+        List<Event> events = eventRepository.findAllByPublicFilters(text, categories, paid, rangeStart, rangeEnd,
+                EventState.PUBLISHED, PageRequest.of(0, candidateCount, Sort.by("eventDate"))).getContent();
 
         return eventsFilterHandler.handleFiltering(events, onlyAvailable, sort, from, size, ip);
     }

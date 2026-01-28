@@ -43,7 +43,6 @@ public interface EventRepository extends JpaRepository<Event, Long> {
                   and (cast(:rangeStart as timestamp) is null or e.eventDate >= :rangeStart)
                   and (cast(:rangeEnd as timestamp) is null or e.eventDate < :rangeEnd)
                   and e.state = :state
-                order by e.eventDate
             """)
     Page<Event> findAllByPublicFilters(
             @Param("text") String text,
@@ -65,7 +64,6 @@ public interface EventRepository extends JpaRepository<Event, Long> {
                   and (cast(:rangeEnd as timestamp) is null or e.eventDate < :rangeEnd)
                   and e.state = :state
                   and e.initiator.id in :ids
-                order by e.eventDate
             """)
     Page<Event> findAllByInitiatorIdAndFilters(
             @Param("text") String text,

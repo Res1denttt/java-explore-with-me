@@ -3,6 +3,7 @@ package ru.practicum.ewm_service.subscription.service;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewm_service.event.dal.EventRepository;
@@ -98,8 +99,8 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         int candidateCount = Math.min(size + 500, 1000);
         List<Long> ids = subscriptionRepository.findContentMakersIdsByFollowerId(userId);
         List<Event> events = eventRepository.findAllByInitiatorIdAndFilters(text, categories, paid, rangeStart, rangeEnd,
-                EventState.PUBLISHED, ids, PageRequest.of(0, candidateCount)).getContent();
-
+                EventState.PUBLISHED, ids, PageRequest.of(0, candidateCount, Sort.by("eventDate")))
+                .getContent();
         return eventsFilterHandler.handleFiltering(events, onlyAvailable, sort, from, size, ip);
     }
 
